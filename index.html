@@ -23,8 +23,8 @@
                         <span class="text-xl font-semibold text-gray-800">UI Reviewer AI</span>
                     </div>
                     <nav class="hidden md:flex space-x-8">
-                        <span class="text-gray-600 hover:text-blue-600 cursor-pointer">Documentation</span>
-                        <span class="text-gray-600 hover:text-blue-600 cursor-pointer">Pricing</span>
+                        <span class="text-gray-600 hover:text-blue-600 cursor-pointer" onclick="window.open('https://rapidapi.com/bilgisamapi-api2/api/ai-website-design-checker-ui-ux-analysis-tool', '_blank')">Documentation</span>
+                        <span class="text-gray-600 hover:text-blue-600 cursor-pointer" onclick="window.open('https://rapidapi.com/bilgisamapi-api2/api/ai-website-design-checker-ui-ux-analysis-tool', '_blank')">Pricing</span>
                         <span class="text-gray-600 hover:text-blue-600 cursor-pointer" onclick="window.open('https://rapidapi.com/bilgisamapi-api2/api/ai-website-design-checker-ui-ux-analysis-tool', '_blank')">Get API Key</span>
                     </nav>
                 </div>
@@ -32,13 +32,13 @@
         </header>
 
         <!-- Main Content -->
-        <main class="container mx-auto px-4 pt-24 pb-12">
+        <main class="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
             <!-- Analyzer Section -->
-            <section id="analyzer" class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-8">
-                <h1 class="text-3xl font-bold text-gray-800 mb-6">Website UI Analysis</h1>
+            <section id="analyzer" class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 mt-8">
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">Website UI Analysis</h1>
                 
                 <!-- Settings -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 sm:mb-8">
                     <div>
                         <label class="block text-gray-700 mb-2">Device Type</label>
                         <select id="deviceType" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
@@ -67,9 +67,9 @@
                 <!-- URL Analysis -->
                 <div class="mb-6">
                     <label class="block text-gray-700 mb-2">Website URL</label>
-                    <div class="flex gap-4">
-                        <input type="url" id="webPageUrl" placeholder="Enter website URL" class="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <button onclick="analyzeWebPage()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input type="url" id="webPageUrl" placeholder="Enter website URL" class="w-full sm:flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="analyzeWebPage()" class="w-full sm:w-auto bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
                             <i class="fa-solid fa-link mr-2"></i>Analyze URL
                         </button>
                     </div>
@@ -89,8 +89,8 @@
                             </button>
                         </div>
                         <div id="imagePreview" class="hidden flex-col items-center">
-                            <img id="previewImg" src="" alt="Preview" class="max-h-48 mb-4 rounded-lg shadow-md">
-                            <div class="flex gap-2">
+                            <img id="previewImg" src="" alt="Preview" class="max-h-48 w-full sm:w-auto mb-4 rounded-lg shadow-md object-contain">
+                            <div class="flex flex-col sm:flex-row gap-2">
                                 <button onclick="analyzeUploadedImage()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
                                     <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Analyze
                                 </button>
@@ -105,20 +105,20 @@
                 <!-- Image URL Analysis -->
                 <div class="mb-6">
                     <label class="block text-gray-700 mb-2">Image URL</label>
-                    <div class="flex gap-4">
-                        <input type="url" id="imageUrl" placeholder="Enter image URL" class="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <button onclick="analyzeImageUrl()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input type="url" id="imageUrl" placeholder="Enter image URL" class="w-full sm:flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="analyzeImageUrl()" class="w-full sm:w-auto bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
                             <i class="fa-solid fa-image mr-2"></i>Analyze Image
                         </button>
                     </div>
                 </div>
 
                 <!-- API Key Input -->
-                <div class="mb-8">
+                <div class="mb-6 sm:mb-8">
                     <label class="block text-gray-700 mb-2">RapidAPI Key</label>
-                    <div class="flex gap-4">
-                        <input type="password" id="apiKey" placeholder="Enter your API key" class="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <button onclick="window.open('https://rapidapi.com/bilgisamapi-api2/api/ai-website-design-checker-ui-ux-analysis-tool', '_blank')" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input type="password" id="apiKey" placeholder="Enter your API key" class="w-full sm:flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="window.open('https://rapidapi.com/bilgisamapi-api2/api/ai-website-design-checker-ui-ux-analysis-tool', '_blank')" class="w-full sm:w-auto bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition">
                             Get API Key
                         </button>
                     </div>
@@ -127,7 +127,7 @@
 
             <!-- Results Section -->
             <section id="results" class="max-w-4xl mx-auto mt-8 hidden">
-                <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-2xl font-bold text-gray-800">Analysis Results</h2>
                         <span id="analysisStatus" class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm">Processing</span>
@@ -135,11 +135,11 @@
                     <div id="loadingSpinner" class="flex items-center justify-center py-12">
                         <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent"></div>
                     </div>
-                    <div id="analysisResults" class="space-y-6 hidden">
+                    <div id="analysisResults" class="space-y-4 sm:space-y-6 hidden">
                         <!-- Summary Section -->
-                        <div class="border-b border-gray-200 pb-6">
-                            <div class="flex items-center gap-4 mb-4">
-                                <div class="text-4xl font-bold text-blue-600" id="overallScore">0/10</div>
+                        <div class="border-b border-gray-200 pb-4 sm:pb-6">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
+                                <div class="text-3xl sm:text-4xl font-bold text-blue-600" id="overallScore">0/10</div>
                                 <div class="flex-1">
                                     <h3 class="text-lg font-semibold text-gray-800 mb-1">Overall Score</h3>
                                     <p class="text-gray-600" id="summaryBrief"></p>
@@ -151,15 +151,15 @@
                             </div>
                         </div>
 
-                        <!-- Analysis Sections -->
-                        <div id="analysisCategories" class="space-y-6">
+                        <!-- Analysis Categories -->
+                        <div id="analysisCategories" class="space-y-4 sm:space-y-6">
                             <!-- Categories will be dynamically added here -->
                         </div>
 
                         <!-- Recommendations Section -->
-                        <div class="border-t border-gray-200 pt-6">
+                        <div class="border-t border-gray-200 pt-4 sm:pt-6">
                             <h3 class="text-lg font-semibold text-gray-800 mb-4">Recommendations</h3>
-                            <div id="recommendations" class="grid gap-4 grid-cols-1 md:grid-cols-2">
+                            <div id="recommendations" class="grid gap-4 grid-cols-1 sm:grid-cols-2">
                                 <!-- Recommendations will be dynamically added here -->
                             </div>
                         </div>
@@ -169,15 +169,12 @@
         </main>
 
         <!-- Footer -->
-        <footer id="footer" class="bg-white border-t">
-            <div class="container mx-auto px-4 py-8">
-                <div class="flex justify-between items-center">
-                    <p class="text-gray-600">&copy; 2024 UI Reviewer AI. All rights reserved.</p>
+        <footer id="footer" class="bg-white border-t mt-8">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <p class="text-gray-600 text-center sm:text-left">&copy; 2024 UI Reviewer AI. All rights reserved.</p>
                     <div class="flex space-x-6">
-                        <a href="#" class="text-gray-600 hover:text-blue-600">
-                            <i class="fa-brands fa-twitter"></i>
-                        </a>
-                        <a href="#" class="text-gray-600 hover:text-blue-600">
+                        <a href="https://github.com/smtkuo/ai-website-design-ui-ux-reviewer" class="text-gray-600 hover:text-blue-600">
                             <i class="fa-brands fa-github"></i>
                         </a>
                         <a href="https://www.linkedin.com/in/samet-utku-olgun/" class="text-gray-600 hover:text-blue-600">
