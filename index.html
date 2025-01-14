@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Reviewer AI - Website Design Analysis Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.9.4/dist/full.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        * { font-family: "Inter", sans-serif; }
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="h-full text-base-content">
+    <div id="main" class="bg-gray-50">
+        <!-- Header -->
+        <header id="header" class="fixed w-full bg-white shadow-sm z-50">
+            <div class="container mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-code-branch text-blue-600 text-2xl"></i>
+                        <span class="text-xl font-semibold text-gray-800">UI Reviewer AI</span>
+                    </div>
+                    <nav class="hidden md:flex space-x-8">
+                        <span class="text-gray-600 hover:text-blue-600 cursor-pointer">Documentation</span>
+                        <span class="text-gray-600 hover:text-blue-600 cursor-pointer">Pricing</span>
+                        <span class="text-gray-600 hover:text-blue-600 cursor-pointer" onclick="window.open('https://rapidapi.com/bilgisamapi-api2/api/ai-website-design-checker-ui-ux-analysis-tool', '_blank')">Get API Key</span>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 pt-24 pb-12">
+            <!-- Analyzer Section -->
+            <section id="analyzer" class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-6">Website UI Analysis</h1>
+                
+                <!-- Settings -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Device Type</label>
+                        <select id="deviceType" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                            <option value="desktop">Desktop</option>
+                            <option value="mobile">Mobile</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Language</label>
+                        <select id="language" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                            <option value="en" data-name="English">English</option>
+                            <option value="tr" data-name="Turkish">Turkish</option>
+                            <option value="es" data-name="Spanish">Spanish</option>
+                            <option value="fr" data-name="French">French</option>
+                            <option value="de" data-name="German">German</option>
+                            <option value="it" data-name="Italian">Italian</option>
+                            <option value="pt" data-name="Portuguese">Portuguese</option>
+                            <option value="ru" data-name="Russian">Russian</option>
+                            <option value="zh" data-name="Chinese">Chinese</option>
+                            <option value="ja" data-name="Japanese">Japanese</option>
+                            <option value="ko" data-name="Korean">Korean</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- URL Analysis -->
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Website URL</label>
+                    <div class="flex gap-4">
+                        <input type="url" id="webPageUrl" placeholder="Enter website URL" class="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="analyzeWebPage()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-link mr-2"></i>Analyze URL
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Upload Screenshot</label>
+                    <div id="dropZone" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors relative">
+                        <input type="file" id="imageUpload" accept="image/*" class="hidden" onchange="handleImagePreview(this)">
+                        <div id="uploadPlaceholder" class="cursor-pointer">
+                            <i class="fa-solid fa-cloud-arrow-up text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-600 mb-2">Drag and drop your image here</p>
+                            <p class="text-gray-400 text-sm mb-4">or</p>
+                            <button onclick="document.getElementById('imageUpload').click()" class="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition">
+                                Browse Files
+                            </button>
+                        </div>
+                        <div id="imagePreview" class="hidden flex-col items-center">
+                            <img id="previewImg" src="" alt="Preview" class="max-h-48 mb-4 rounded-lg shadow-md">
+                            <div class="flex gap-2">
+                                <button onclick="analyzeUploadedImage()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Analyze
+                                </button>
+                                <button onclick="removeImage()" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition">
+                                    <i class="fa-solid fa-trash mr-2"></i>Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image URL Analysis -->
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Image URL</label>
+                    <div class="flex gap-4">
+                        <input type="url" id="imageUrl" placeholder="Enter image URL" class="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="analyzeImageUrl()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-image mr-2"></i>Analyze Image
+                        </button>
+                    </div>
+                </div>
+
+                <!-- API Key Input -->
+                <div class="mb-8">
+                    <label class="block text-gray-700 mb-2">RapidAPI Key</label>
+                    <div class="flex gap-4">
+                        <input type="password" id="apiKey" placeholder="Enter your API key" class="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="window.open('https://rapidapi.com/bilgisamapi-api2/api/ai-website-design-checker-ui-ux-analysis-tool', '_blank')" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition">
+                            Get API Key
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results" class="max-w-4xl mx-auto mt-8 hidden">
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Analysis Results</h2>
+                        <span id="analysisStatus" class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm">Processing</span>
+                    </div>
+                    <div id="loadingSpinner" class="flex items-center justify-center py-12">
+                        <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent"></div>
+                    </div>
+                    <div id="analysisResults" class="space-y-6 hidden">
+                        <!-- Summary Section -->
+                        <div class="border-b border-gray-200 pb-6">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="text-4xl font-bold text-blue-600" id="overallScore">0/10</div>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-1">Overall Score</h3>
+                                    <p class="text-gray-600" id="summaryBrief"></p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <h4 class="text-sm font-semibold text-gray-700 mb-2">Key Issues</h4>
+                                <ul class="space-y-1 text-sm text-gray-600" id="keyIssues"></ul>
+                            </div>
+                        </div>
+
+                        <!-- Analysis Sections -->
+                        <div id="analysisCategories" class="space-y-6">
+                            <!-- Categories will be dynamically added here -->
+                        </div>
+
+                        <!-- Recommendations Section -->
+                        <div class="border-t border-gray-200 pt-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Recommendations</h3>
+                            <div id="recommendations" class="grid gap-4 grid-cols-1 md:grid-cols-2">
+                                <!-- Recommendations will be dynamically added here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer id="footer" class="bg-white border-t">
+            <div class="container mx-auto px-4 py-8">
+                <div class="flex justify-between items-center">
+                    <p class="text-gray-600">&copy; 2024 UI Reviewer AI. All rights reserved.</p>
+                    <div class="flex space-x-6">
+                        <a href="#" class="text-gray-600 hover:text-blue-600">
+                            <i class="fa-brands fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-600 hover:text-blue-600">
+                            <i class="fa-brands fa-github"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/samet-utku-olgun/" class="text-gray-600 hover:text-blue-600">
+                            <i class="fa-brands fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const API_HOST = 'https://ai-website-design-checker-ui-ux-analysis-tool.p.rapidapi.com';
+
+        // State management functions
+        function saveStateToHash(state) {
+            const base64State = btoa(encodeURIComponent(JSON.stringify(state)));
+            window.location.hash = base64State;
+        }
+
+        function getStateFromHash() {
+            try {
+                const hash = window.location.hash.slice(1); // Remove the # symbol
+                if (hash) {
+                    return JSON.parse(decodeURIComponent(atob(hash)));
+                }
+            } catch (error) {
+                console.error('Error parsing state from hash:', error);
+            }
+            return null;
+        }
+
+        function updateState(newData = {}) {
+            const currentState = getStateFromHash() || {};
+            const updatedState = { ...currentState, ...newData };
+            saveStateToHash(updatedState);
+        }
+
+        // Function to restore state from URL
+        function restoreState() {
+            const state = getStateFromHash();
+            if (state) {
+                // Restore form values
+                if (state.webPageUrl) {
+                    document.getElementById('webPageUrl').value = state.webPageUrl;
+                }
+                if (state.imageUrl) {
+                    document.getElementById('imageUrl').value = state.imageUrl;
+                }
+                if (state.apiKey) {
+                    document.getElementById('apiKey').value = state.apiKey;
+                }
+                if (state.device) {
+                    document.getElementById('deviceType').value = state.device;
+                }
+                if (state.language) {
+                    document.getElementById('language').value = state.language;
+                }
+
+                // Restore results if they exist
+                if (state.analysisResults) {
+                    showResults();
+                    displayResults(state.analysisResults);
+                }
+
+                // If there's an image preview URL in the state, restore it
+                if (state.imagePreviewUrl) {
+                    document.getElementById('previewImg').src = state.imagePreviewUrl;
+                    document.getElementById('uploadPlaceholder').classList.add('hidden');
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                    document.getElementById('imagePreview').classList.add('flex');
+                }
+            }
+        }
+
+        // Function to handle hash changes
+        window.addEventListener('hashchange', restoreState);
+
+        // Add input event listeners
+        function setupStateListeners() {
+            const inputs = ['webPageUrl', 'imageUrl', 'apiKey', 'deviceType', 'language'];
+            inputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', function() {
+                    updateState({
+                        [id]: this.value
+                    });
+                });
+            });
+        }
+
+        // Function to handle image preview
+        function handleImagePreview(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imagePreviewUrl = e.target.result;
+                    document.getElementById('previewImg').src = imagePreviewUrl;
+                    document.getElementById('uploadPlaceholder').classList.add('hidden');
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                    document.getElementById('imagePreview').classList.add('flex');
+                    // Save preview URL to state
+                    updateState({ imagePreviewUrl });
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Function to remove image
+        function removeImage() {
+            document.getElementById('imageUpload').value = '';
+            document.getElementById('previewImg').src = '';
+            document.getElementById('uploadPlaceholder').classList.remove('hidden');
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('imagePreview').classList.remove('flex');
+            // Remove image preview from state
+            const currentState = getStateFromHash() || {};
+            delete currentState.imagePreviewUrl;
+            saveStateToHash(currentState);
+        }
+
+        // Initialize the page
+        function initializePage() {
+            // First restore state from hash if exists
+            restoreState();
+            // Then set user language if not already set in hash
+            if (!window.location.hash) {
+                setUserLanguage();
+            }
+            // Setup input listeners
+            setupStateListeners();
+        }
+
+        // Call initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        // Function to set user's language
+        function setUserLanguage() {
+            const languageSelect = document.getElementById('language');
+            const userLanguages = navigator.languages || [navigator.language || navigator.userLanguage];
+            
+            // Get all available language codes from select options
+            const availableLanguages = Array.from(languageSelect.options).map(option => option.value);
+            
+            // Try to find a matching language
+            let matchedLang = null;
+            for (let lang of userLanguages) {
+                // Get the base language code (e.g., 'en' from 'en-US')
+                const baseLang = lang.split('-')[0].toLowerCase();
+                if (availableLanguages.includes(baseLang)) {
+                    matchedLang = baseLang;
+                    break;
+                }
+            }
+
+            if (matchedLang) {
+                // If we found a matching language, select it
+                languageSelect.value = matchedLang;
+            } else {
+                // If no match found, add user's primary language as a new option
+                const primaryLang = userLanguages[0].split('-')[0].toLowerCase();
+                const option = document.createElement('option');
+                option.value = primaryLang;
+                option.textContent = `${primaryLang.toUpperCase()} (${primaryLang})`;
+                languageSelect.add(option);
+                languageSelect.value = primaryLang;
+            }
+
+            // Update state with initial language
+            updateState({ language: languageSelect.value });
+        }
+
+        // Function to get common request parameters
+        function getCommonParams() {
+            return {
+                language: document.getElementById('language').value,
+                device: document.getElementById('deviceType').value
+            };
+        }
+
+        // Function to analyze webpage URL
+        async function analyzeWebPage() {
+            const webPageUrl = document.getElementById('webPageUrl').value;
+            const apiKey = document.getElementById('apiKey').value;
+
+            if (!webPageUrl || !apiKey) {
+                alert('Please enter both URL and API key');
+                return;
+            }
+
+            showResults();
+            
+            try {
+                const response = await fetch(`${API_HOST}/analyze?noqueue=1`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-rapidapi-key': apiKey,
+                        'x-rapidapi-host': 'ai-website-design-checker-ui-ux-analysis-tool.p.rapidapi.com'
+                    },
+                    body: JSON.stringify({
+                        webPageUrl: webPageUrl,
+                        ...getCommonParams()
+                    })
+                });
+
+                const data = await response.json();
+                updateState({ analysisResults: data });
+                displayResults(data);
+            } catch (error) {
+                handleError(error);
+            }
+        }
+
+        // Function to analyze image URL
+        async function analyzeImageUrl() {
+            const imageUrl = document.getElementById('imageUrl').value;
+            const apiKey = document.getElementById('apiKey').value;
+
+            if (!imageUrl || !apiKey) {
+                alert('Please enter both image URL and API key');
+                return;
+            }
+
+            showResults();
+
+            try {
+                const response = await fetch(`${API_HOST}/analyze?noqueue=1`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-rapidapi-key': apiKey,
+                        'x-rapidapi-host': 'ai-website-design-checker-ui-ux-analysis-tool.p.rapidapi.com'
+                    },
+                    body: JSON.stringify({
+                        imageUrl: imageUrl,
+                        ...getCommonParams()
+                    })
+                });
+
+                const data = await response.json();
+                updateState({ analysisResults: data });
+                displayResults(data);
+            } catch (error) {
+                handleError(error);
+            }
+        }
+
+        // Function to handle image upload and analysis
+        async function analyzeUploadedImage() {
+            const fileInput = document.getElementById('imageUpload');
+            const apiKey = document.getElementById('apiKey').value;
+
+            if (!fileInput.files[0] || !apiKey) {
+                alert('Please select an image and enter API key');
+                return;
+            }
+
+            showResults();
+
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            const { language, device } = getCommonParams();
+            formData.append('language', language);
+            formData.append('device', device);
+
+            try {
+                const response = await fetch(`${API_HOST}/analyze?noqueue=1`, {
+                    method: 'POST',
+                    headers: {
+                        'x-rapidapi-key': apiKey,
+                        'x-rapidapi-host': 'ai-website-design-checker-ui-ux-analysis-tool.p.rapidapi.com'
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                updateState({ analysisResults: data });
+                displayResults(data);
+            } catch (error) {
+                handleError(error);
+            }
+        }
+
+        // Function to show results section
+        function showResults() {
+            const resultsSection = document.getElementById('results');
+            resultsSection.classList.remove('hidden');
+            document.getElementById('loadingSpinner').classList.remove('hidden');
+            document.getElementById('analysisResults').classList.add('hidden');
+            document.getElementById('analysisStatus').textContent = 'Processing';
+            document.getElementById('analysisStatus').classList.remove('bg-green-100', 'text-green-600', 'bg-red-100', 'text-red-600');
+            document.getElementById('analysisStatus').classList.add('bg-blue-100', 'text-blue-600');
+
+            // Smooth scroll to results section
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Function to display analysis results
+        function displayResults(data) {
+            if (!data || !data.result) {
+                handleError(new Error('Invalid response data'));
+                return;
+            }
+
+            const resultsContainer = document.getElementById('analysisResults');
+            const statusElement = document.getElementById('analysisStatus');
+            
+            if (!resultsContainer || !statusElement) {
+                console.error('Required DOM elements not found');
+                return;
+            }
+
+            document.getElementById('loadingSpinner').classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+
+            if (data.status === 'success') {
+                statusElement.textContent = 'Completed';
+                statusElement.classList.remove('bg-blue-100', 'text-blue-600', 'bg-red-100', 'text-red-600');
+                statusElement.classList.add('bg-green-100', 'text-green-600');
+
+                const overallScoreElement = document.getElementById('overallScore');
+                const summaryBriefElement = document.getElementById('summaryBrief');
+                const keyIssuesList = document.getElementById('keyIssues');
+
+                if (overallScoreElement && data.result.summary) {
+                    overallScoreElement.textContent = `${data.result.summary.score}/10`;
+                }
+                
+                if (summaryBriefElement && data.result.summary) {
+                    summaryBriefElement.textContent = data.result.summary.brief;
+                }
+                
+                // Display key issues with null check
+                if (keyIssuesList && data.result.summary && data.result.summary.keyIssues) {
+                    keyIssuesList.innerHTML = data.result.summary.keyIssues.map(issue => 
+                        `<li class="flex items-start gap-2">
+                            <i class="fas fa-exclamation-circle text-yellow-500 mt-1"></i>
+                            <span>${issue}</span>
+                        </li>`
+                    ).join('');
+                }
+
+                // Display analysis categories
+                const categoriesContainer = document.getElementById('analysisCategories');
+                if (categoriesContainer && data.result.analysis) {
+                    categoriesContainer.innerHTML = '';
+                    
+                    Object.entries(data.result.analysis).forEach(([category, details]) => {
+                        // Convert snake_case to display text
+                        const displayCategory = category.split('_').map(word => 
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        ).join(' ');
+
+                        const categoryHtml = `
+                            <div class="border border-gray-200 rounded-lg p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-semibold text-gray-800">${displayCategory}</h3>
+                                        <span class="text-sm text-gray-500">Importance: ${details.importance}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-2xl font-bold ${getScoreColor(details.score)}">${details.score}/10</span>
+                                    </div>
+                                </div>
+                                ${details.elements && details.elements.length > 0 ? `
+                                    <div class="space-y-4 mb-4">
+                                        ${details.elements.map(element => `
+                                            <div class="bg-gray-50 rounded-lg p-4">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <span class="font-medium text-gray-700">${element.name}</span>
+                                                    <span class="px-2 py-1 rounded text-sm ${getStatusColor(element.status)}">${element.status}</span>
+                                                </div>
+                                                ${element.issues && element.issues.length > 0 ? `
+                                                    <div class="space-y-1 mt-2">
+                                                        ${element.issues.map(issue => `
+                                                            <div class="flex items-start gap-2 text-sm">
+                                                                <i class="fas fa-times-circle text-red-500 mt-1"></i>
+                                                                <span class="text-gray-600">${issue}</span>
+                                                            </div>
+                                                        `).join('')}
+                                                    </div>
+                                                ` : ''}
+                                                ${element.fixes && element.fixes.length > 0 ? `
+                                                    <div class="space-y-1 mt-2">
+                                                        ${element.fixes.map(fix => `
+                                                            <div class="flex items-start gap-2 text-sm">
+                                                                <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                                                                <span class="text-gray-600">${fix}</span>
+                                                            </div>
+                                                        `).join('')}
+                                                    </div>
+                                                ` : ''}
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                                ${details.groupIssues && details.groupIssues.length > 0 ? `
+                                    <div class="mt-4">
+                                        <h4 class="text-sm font-semibold text-gray-700 mb-2">Group Issues</h4>
+                                        <ul class="space-y-1">
+                                            ${details.groupIssues.map(issue => `
+                                                <li class="flex items-start gap-2 text-sm">
+                                                    <i class="fas fa-exclamation-circle text-yellow-500 mt-1"></i>
+                                                    <span class="text-gray-600">${issue}</span>
+                                                </li>
+                                            `).join('')}
+                                        </ul>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                        categoriesContainer.innerHTML += categoryHtml;
+                    });
+                }
+
+                // Display recommendations
+                const recommendationsContainer = document.getElementById('recommendations');
+                if (recommendationsContainer && data.result.recommendations) {
+                    recommendationsContainer.innerHTML = data.result.recommendations.map(rec => `
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-1 rounded text-xs ${getPriorityColor(rec.priority)}">${rec.priority}</span>
+                                <span class="text-sm font-medium text-gray-700">${rec.area}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">${rec.suggested}</p>
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-blue-600">Impact: ${rec.impact}</span>
+                                <span class="text-gray-500">Effort: ${rec.effort}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+            } else {
+                handleError(new Error(data.message || 'Analysis failed'));
+            }
+        }
+
+        // Helper functions for styling
+        function getScoreColor(score) {
+            const scoreNum = parseInt(score);
+            if (scoreNum >= 8) return 'text-green-600';
+            if (scoreNum >= 6) return 'text-yellow-600';
+            return 'text-red-600';
+        }
+
+        function getStatusColor(status) {
+            switch (status.toLowerCase()) {
+                case 'good': return 'bg-green-100 text-green-600';
+                case 'warning': return 'bg-yellow-100 text-yellow-600';
+                case 'critical': return 'bg-red-100 text-red-600';
+                default: return 'bg-gray-100 text-gray-600';
+            }
+        }
+
+        function getPriorityColor(priority) {
+            switch (priority.toLowerCase()) {
+                case 'high': return 'bg-red-100 text-red-600';
+                case 'medium': return 'bg-yellow-100 text-yellow-600';
+                case 'low': return 'bg-green-100 text-green-600';
+                default: return 'bg-gray-100 text-gray-600';
+            }
+        }
+
+        // Function to handle errors
+        function handleError(error) {
+            const statusElement = document.getElementById('analysisStatus');
+            statusElement.textContent = 'Error';
+            statusElement.classList.remove('bg-blue-100', 'text-blue-600', 'bg-green-100', 'text-green-600');
+            statusElement.classList.add('bg-red-100', 'text-red-600');
+
+            document.getElementById('loadingSpinner').classList.add('hidden');
+            document.getElementById('analysisResults').classList.remove('hidden');
+            document.getElementById('analysisResults').innerHTML = `
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p class="text-red-600">${error.message}</p>
+                </div>
+            `;
+        }
+
+        // Add drag and drop functionality
+        const dropZone = document.getElementById('dropZone');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-blue-500');
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-blue-500');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-blue-500');
+            
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const input = document.getElementById('imageUpload');
+                input.files = e.dataTransfer.files;
+                handleImagePreview(input);
+            }
+        });
+    </script>
+</body>
+</html>
