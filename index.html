@@ -132,10 +132,32 @@
                         <h2 class="text-2xl font-bold text-gray-800">Analysis Results</h2>
                         <span id="analysisStatus" class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm">Processing</span>
                     </div>
+                    
                     <div id="loadingSpinner" class="flex items-center justify-center py-12">
                         <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent"></div>
                     </div>
+
                     <div id="analysisResults" class="space-y-4 sm:space-y-6 hidden">
+                        <!-- Add Export PDF Button at the top -->
+                        <div class="flex justify-end mb-4">
+                            <button onclick="generatePDFReport()" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas fa-file-pdf"></i>
+                                Export PDF Report
+                            </button>
+                        </div>
+
+                        <!-- Image Preview with Analysis Overlay -->
+                        <div class="relative w-full mb-8">
+                            <div id="imageContainer" class="relative mx-auto" style="max-width: 1366px;">
+                                <div class="relative w-full" style="position: relative;">
+                                    <img id="analyzedImage" src="" alt="Analyzed Image" class="w-full h-auto rounded-lg shadow-md" style="display: block;">
+                                    <div id="analysisOverlay" class="absolute inset-0" style="pointer-events: none;">
+                                        <!-- Analysis boxes will be added here dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Summary Section -->
                         <div class="border-b border-gray-200 pb-4 sm:pb-6">
                             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
@@ -491,6 +513,134 @@
             document.getElementById('loadingSpinner').classList.add('hidden');
             resultsContainer.classList.remove('hidden');
 
+            // Clear previous analysis overlay
+            const overlay = document.getElementById('analysisOverlay');
+            overlay.innerHTML = '';
+
+            // Get the image container section
+            const imageSection = document.querySelector('#imageContainer').parentElement;
+
+            // Check if there's image data
+            if (data.image && data.image.base64) {
+                // Show image section
+                imageSection.classList.remove('hidden');
+                
+                const analyzedImage = document.getElementById('analyzedImage');
+                const imageContainer = document.getElementById('imageContainer');
+                const overlay = document.getElementById('analysisOverlay');
+                
+                // Set image source
+                analyzedImage.src = data.image.base64;
+                
+                // Get dimensions from API response
+                const originalWidth = data.imageStats?.dimensions?.width || 0;
+                const originalHeight = data.imageStats?.dimensions?.height || 0;
+                
+                if (originalWidth && originalHeight) {
+                    // Calculate maximum width while maintaining aspect ratio
+                    const maxWidth = Math.min(800, originalWidth);
+                    const scaleFactor = maxWidth / originalWidth;
+                    const scaledHeight = originalHeight * scaleFactor;
+                    
+                    // Set container and image dimensions
+                    imageContainer.style.maxWidth = `${maxWidth}px`;
+                    imageContainer.style.margin = '0 auto';
+                    analyzedImage.style.width = '100%';
+                    analyzedImage.style.height = 'auto';
+                    
+                    // Function to update analysis boxes
+                    function updateAnalysisBoxes() {
+                        overlay.innerHTML = '';
+                        
+                        if (!data.result.analysis) return;
+                        
+                        // Get current image dimensions
+                        const currentRect = analyzedImage.getBoundingClientRect();
+                        const scaleX = currentRect.width / originalWidth;
+                        const scaleY = currentRect.height / originalHeight;
+                        
+                        Object.entries(data.result.analysis).forEach(([category, details]) => {
+                            if (details.elements) {
+                                details.elements.forEach(element => {
+                                    if (element.coords) {
+                                        const box = document.createElement('div');
+                                        box.className = 'absolute border-2 bg-blue-100 bg-opacity-20 group';
+                                        
+                                        // Set border color based on status
+                                        const statusClass = element.status ? getStatusColor(element.status) : 'border-blue-500';
+                                        box.className += ` border-${statusClass.split('-')[2]}`;
+                                        
+                                        // Ensure coordinates are within image bounds
+                                        const x = Math.min(Math.max(0, element.coords.x), originalWidth);
+                                        const y = Math.min(Math.max(0, element.coords.y), originalHeight);
+                                        const width = Math.min(element.coords.width, originalWidth - x);
+                                        const height = Math.min(element.coords.height, originalHeight - y);
+                                        
+                                        // Scale coordinates based on current image size
+                                        const scaledX = x * scaleX;
+                                        const scaledY = y * scaleY;
+                                        const scaledWidth = width * scaleX;
+                                        const scaledHeight = height * scaleY;
+                                        
+                                        // Position box
+                                        box.style.left = `${scaledX}px`;
+                                        box.style.top = `${scaledY}px`;
+                                        box.style.width = `${scaledWidth}px`;
+                                        box.style.height = `${scaledHeight}px`;
+                                        
+                                        // Create label container with improved positioning
+                                        const labelContainer = document.createElement('div');
+                                        labelContainer.className = 'absolute transform -translate-y-full -top-2 left-0 flex items-center gap-2 whitespace-nowrap z-10';
+                                        
+                                        // Add name label
+                                        const nameLabel = document.createElement('div');
+                                        nameLabel.className = `text-xs px-2 py-1 rounded-l ${statusClass}`;
+                                        nameLabel.textContent = element.name;
+                                        labelContainer.appendChild(nameLabel);
+                                        
+                                        // Add category badge
+                                        const categoryBadge = document.createElement('div');
+                                        categoryBadge.className = 'text-xs px-2 py-1 rounded-r bg-gray-100 text-gray-600';
+                                        categoryBadge.textContent = category;
+                                        labelContainer.appendChild(categoryBadge);
+                                        
+                                        box.appendChild(labelContainer);
+                                        
+                                        // Add hover info if there are issues
+                                        if (element.issues && element.issues.length > 0) {
+                                            const issuesContainer = document.createElement('div');
+                                            issuesContainer.className = 'hidden group-hover:block absolute left-0 top-full mt-2 bg-white border border-gray-200 rounded p-2 shadow-lg z-20 w-64';
+                                            issuesContainer.innerHTML = element.issues.map(issue => `
+                                                <div class="flex items-start gap-2 mb-2 last:mb-0">
+                                                    <i class="fas fa-exclamation-circle text-yellow-500 mt-1"></i>
+                                                    <span class="text-sm text-gray-600">${issue}</span>
+                                                </div>
+                                            `).join('');
+                                            box.appendChild(issuesContainer);
+                                        }
+                                        
+                                        overlay.appendChild(box);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    
+                    // Initial update
+                    updateAnalysisBoxes();
+                    
+                    // Update on resize
+                    const resizeObserver = new ResizeObserver(() => {
+                        requestAnimationFrame(updateAnalysisBoxes);
+                    });
+                    
+                    resizeObserver.observe(analyzedImage);
+                }
+            } else {
+                // Hide image section if no image data
+                imageSection.classList.add('hidden');
+            }
+
             if (data.status === 'success') {
                 statusElement.textContent = 'Completed';
                 statusElement.classList.remove('bg-blue-100', 'text-blue-600', 'bg-red-100', 'text-red-600');
@@ -608,7 +758,6 @@
                         </div>
                     `).join('');
                 }
-
             } else {
                 handleError(new Error(data.message || 'Analysis failed'));
             }
@@ -680,6 +829,175 @@
                 handleImagePreview(input);
             }
         });
+
+        // Update window resize handler
+        window.addEventListener('resize', () => {
+            const state = getStateFromHash();
+            if (state && state.analysisResults) {
+                displayResults(state.analysisResults);
+            }
+        });
+
+        // Add PDF generation function
+        async function generatePDFReport() {
+            // Add loading state to button
+            const button = document.querySelector('button[onclick="generatePDFReport()"]');
+            const originalContent = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+            button.disabled = true;
+
+            try {
+                // Load html2canvas and jsPDF from CDN
+                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+
+                const analysisResults = document.getElementById('analysisResults');
+                
+                // Create PDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const margin = 20;
+                const contentWidth = pageWidth - (2 * margin);
+                
+                // Add title
+                pdf.setFontSize(20);
+                pdf.setTextColor(0, 0, 0);
+                pdf.text('UI Analysis Report', margin, margin);
+                
+                // Add date
+                pdf.setFontSize(12);
+                pdf.setTextColor(100);
+                pdf.text(`Generated on: ${new Date().toLocaleString()}`, margin, margin + 10);
+
+                let currentY = margin + 30;
+
+                // Add input details
+                pdf.setFontSize(14);
+                pdf.setTextColor(0, 0, 0);
+                pdf.text('Analysis Details', margin, currentY);
+                currentY += 10;
+
+                pdf.setFontSize(12);
+                pdf.setTextColor(60);
+
+                // Get state to determine input type
+                const state = getStateFromHash();
+                if (state) {
+                    // Get analysis results from state
+                    const analysisData = state.analysisResults;
+                    
+                    if (state.webPageUrl) {
+                        pdf.text(`Analysis Type: Website URL`, margin, currentY);
+                        currentY += 7;
+                        pdf.text(`URL: ${state.webPageUrl}`, margin, currentY);
+                    } else if (state.imageUrl) {
+                        pdf.text(`Analysis Type: Image URL`, margin, currentY);
+                        currentY += 7;
+                        pdf.text(`URL: ${state.imageUrl}`, margin, currentY);
+                    } else if (state.imagePreviewUrl) {
+                        pdf.text(`Analysis Type: Uploaded Image`, margin, currentY);
+                        currentY += 7;
+                        if (analysisData?.imageStats) {
+                            pdf.text(`Image Size: ${analysisData.imageStats.originalSize} bytes`, margin, currentY);
+                            currentY += 7;
+                            pdf.text(`Dimensions: ${analysisData.imageStats.dimensions.width}x${analysisData.imageStats.dimensions.height} pixels`, margin, currentY);
+                        }
+                    }
+                    
+                    // Add device type
+                    currentY += 7;
+                    const deviceType = state.deviceType || document.getElementById('deviceType').value;
+                    pdf.text(`Device Type: ${deviceType.charAt(0).toUpperCase() + deviceType.slice(1)}`, margin, currentY);
+                    
+                    // Add language
+                    currentY += 7;
+                    const languageSelect = document.getElementById('language');
+                    const selectedOption = languageSelect.options[languageSelect.selectedIndex];
+                    const languageName = selectedOption.getAttribute('data-name');
+                    const languageCode = state.language || languageSelect.value;
+                    pdf.text(`Language: ${languageName} (${languageCode})`, margin, currentY);
+                }
+
+                currentY += 20; // Add extra spacing after input details
+
+                // Function to add new page
+                function addNewPage() {
+                    pdf.addPage();
+                    currentY = margin;
+                }
+
+                // Function to add section with height check
+                async function addSection(element) {
+                    const canvas = await html2canvas(element, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff'
+                    });
+
+                    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                    const imgProps = pdf.getImageProperties(imgData);
+                    const imgWidth = contentWidth;
+                    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+
+                    // Check if we need a new page
+                    if (currentY + imgHeight > pageHeight - margin) {
+                        addNewPage();
+                    }
+
+                    pdf.addImage(imgData, 'JPEG', margin, currentY, imgWidth, imgHeight);
+                    currentY += imgHeight + 10; // Add some spacing
+                }
+
+                // Get all main sections
+                const imageSection = analysisResults.querySelector('#imageContainer').parentElement;
+                const summarySection = analysisResults.querySelector('.border-b');
+                const categoriesSection = document.getElementById('analysisCategories');
+                const recommendationsSection = analysisResults.querySelector('.border-t');
+
+                // Only add image section if it's visible
+                if (!imageSection.classList.contains('hidden')) {
+                    await addSection(imageSection);
+                }
+
+                // Add summary section
+                await addSection(summarySection);
+
+                // Add each analysis category separately
+                const categories = categoriesSection.children;
+                for (let category of categories) {
+                    await addSection(category);
+                }
+
+                // Add recommendations section
+                await addSection(recommendationsSection);
+
+                // Save PDF
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                pdf.save(`ui-analysis-report-${timestamp}.pdf`);
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('Error generating PDF report. Please try again.');
+            } finally {
+                // Restore button state
+                button.innerHTML = originalContent;
+                button.disabled = false;
+            }
+        }
+
+        // Helper function to load external scripts
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
     </script>
 </body>
 </html>
